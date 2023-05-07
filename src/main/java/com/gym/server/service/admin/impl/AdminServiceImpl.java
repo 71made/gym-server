@@ -1,7 +1,9 @@
 package com.gym.server.service.admin.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.gym.server.mapper.AdminMapper;
+import com.gym.server.mapper.MemberMapper;
 import com.gym.server.model.po.admin.Admin;
 import com.gym.server.model.po.member.Member;
 import com.gym.server.service.admin.AdminService;
@@ -25,6 +27,9 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     AdminMapper adminMapper;
 
+    @Autowired
+    MemberMapper memberMapper;
+
     @Override
     public Result login(String account, String password) {
         // 查询管理员
@@ -39,5 +44,21 @@ public class AdminServiceImpl implements AdminService {
         if (!password.equals(admin.getPassword()))
             return Results.failureWithStatus(Results.Status.LOGIN_ERROR, "管理员密码错误");
         return Results.successWithData(Results.Status.LOGIN_SUCCESS, admin);
+    }
+
+    @Override
+    public Result memberAll() {
+        QueryWrapper<Member> wrapper = new QueryWrapper<>();
+        wrapper.ne(Member.Columns.STATUS, Member.Status.DELETE);
+        return Results.successWithData(memberMapper.selectList(wrapper));
+    }
+
+    @Override
+    public Result update(Integer memberId, Member.Status status) {
+        if (status.equals(Member.Status.UNKNOWN)) return Results.failure("更新状态失败");
+        UpdateWrapper<Member> wrapper = new UpdateWrapper<>();
+        wrapper.eq(Member.Columns.ID, memberId).set(Member.Columns.STATUS, status.getValue());
+        if (memberMapper.update(null, wrapper) == 0) return Results.failure("更新状态失败");
+        return Results.success("更新成功");
     }
 }

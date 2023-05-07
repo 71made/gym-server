@@ -23,4 +23,10 @@ public class PagesController {
     public String adminLogin() {
         return "/pages/admin/login";
     }
+
+
+    @GetMapping("/admin/member")
+    public String adminMembers() {
+        return "/pages/admin/member";
+    }
 }

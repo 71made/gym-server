@@ -59,6 +59,7 @@ public class MemberServiceImpl implements MemberService {
         // 构建新会员
         member = new Member();
         member.setPhone(registerDTO.getPhone());
+        member.setName(registerDTO.getName());
         // MD5 摘要处理密码
         member.setPassword(DigestUtils.md5DigestAsHex(registerDTO.getPassword().getBytes()));
         member.setCardNumber(registerDTO.getPhone());
@@ -76,7 +77,7 @@ public class MemberServiceImpl implements MemberService {
     public Result info(Integer memberId) {
         // 查询会员
         Member member = memberMapper.selectById(memberId);
-        if (null == member) return Results.failureWithStatus(Results.Status.RECORD_NOT_EXIST);
+        if (null == member || member.getStatus().equals(Member.Status.DISABLE)) return Results.failureWithStatus(Results.Status.RECORD_NOT_EXIST);
         return Results.successWithData(member);
     }
 }

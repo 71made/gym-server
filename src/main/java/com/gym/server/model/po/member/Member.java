@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gym.server.model.po.admin.Admin;
 import com.gym.utils.date.Dates;
@@ -38,7 +39,11 @@ public class Member {
     @JsonProperty("card_number")
     private String cardNumber;
 
+    @TableField(Columns.NAME)
+    private String name;
+
     @TableField(Columns.PASSWORD)
+    @JsonIgnore
     private String password;
 
     @TableField(value = Columns.STATUS, typeHandler = Status.TypeHandler.class)
@@ -82,6 +87,10 @@ public class Member {
          * 禁用
          */
         DISABLE(2),
+        /**
+         * 删除
+         */
+        DELETE(3),
         UNKNOWN(null);
 
         private final Integer value;

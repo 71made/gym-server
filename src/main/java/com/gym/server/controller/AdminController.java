@@ -46,4 +46,25 @@ public class AdminController {
         }
         return result;
     }
+
+    @GetMapping("/member/all")
+    @ApiOperation(value = "admin member all", notes = "获取会员列表")
+    public Result memberAll(@ApiIgnore HttpServletRequest request) {
+        HttpSession session = request.getSession(true);
+        Integer adminId = (Integer) session.getAttribute("admin_id");
+        if (null == adminId) return Results.failureWithStatus(Results.Status.LOGIN_MISSING);
+        return adminService.memberAll();
+    }
+
+    @GetMapping("/member/update")
+    @ApiOperation(value = "admin member update", notes = "更新会员状态")
+    public Result memberAll(@ApiIgnore HttpServletRequest request,
+                            @RequestParam("member_id") @ApiParam(value = "会员 id", required = true) Integer memberId,
+                            @RequestParam("status") @ApiParam(value = "会员状态", required = true) Integer status) {
+        HttpSession session = request.getSession(true);
+        Integer adminId = (Integer) session.getAttribute("admin_id");
+        if (null == adminId) return Results.failureWithStatus(Results.Status.LOGIN_MISSING);
+        if (null == memberId || null == status) return Results.failureWithStatus(Results.Status.BAD_REQUEST);
+        return adminService.update(memberId, Member.Status.parse(status));
+    }
 }

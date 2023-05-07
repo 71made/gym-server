@@ -18,6 +18,8 @@ import java.math.BigDecimal;
 public class MemberRegisterDTO extends BaseDTO {
     @JsonProperty("password")
     private String password;
+    @JsonProperty("name")
+    private String name;
     @JsonProperty("status")
     private int status;
     @JsonProperty("type")
@@ -27,6 +29,6 @@ public class MemberRegisterDTO extends BaseDTO {
 
     @Override
     public boolean verifyParameters() {
-        return !(password.trim().isEmpty() || phone.trim().isEmpty());
+        return !(password.trim().isEmpty() || name.trim().isEmpty() || phone.trim().isEmpty());
     }
 }
