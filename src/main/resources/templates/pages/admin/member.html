@@ -34,17 +34,18 @@
         <nav th:replace="~{partials/_sidebar :: sidebar}"></nav>
         <!-- partial -->
         <div class="main-panel">
-            <div class="content-wrapper card" style="height: 100%">
-
-                <div class="card-body" style="height: 80vh">
-                    <div class="card-title">
-                        <h2>会员列表</h2>
+            <div class="content-wrapper" style="height: 100%">
+                <div class="card">
+                    <div class="card-body" style="height: 80vh">
+                        <div class="card-title">
+                            <h2>会员列表</h2>
+                        </div>
+                        <!-- 成员列表 -->
+                        <table
+                                id="member-table"
+                                class="table table-hover table-striped"
+                        ></table>
                     </div>
-                    <!-- 成员列表 -->
-                    <table
-                            id="member-table"
-                            class="table table-hover table-striped"
-                    ></table>
                 </div>
             </div>
             <!-- content-wrapper ends -->

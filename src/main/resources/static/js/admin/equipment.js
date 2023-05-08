@@ -36,12 +36,56 @@ $(function () {
     })
 })
 
+let showAddFunc = function () {
+    // 隐藏和展示部分元素
+    $("#equipment-edit-btn").hide()
+    $("#equipment-add-btn").show()
+    $("#equipment-model-label").text("增加器材")
+
+    $(`input:radio[name='status-radios'][value='0']`).prop("checked", true)
+    $(`input:radio[name='status-radios']`).attr("disabled", true)
+    $("#name").val("")
+    $("#location").val("")
+    $("#equipment-model").modal('show')
+}
+
 let showFunc = function (id) {
+    // 隐藏和展示部分元素
+    $("#equipment-edit-btn").show()
+    $("#equipment-add-btn").hide()
+    $("#equipment-model-label").text("修改信息")
+
     equipmentData = $("#equipment-table").bootstrapTable('getRowByUniqueId', id)
+    $(`input:radio[name='status-radios']`).attr("disabled", false)
     $(`input:radio[name='status-radios'][value='${equipmentData.status}']`).prop("checked", true)
     $("#name").val(equipmentData.name)
     $("#location").val(equipmentData.location)
     $("#equipment-model").modal('show')
+}
+
+let closeModal = function () {
+    $("#staff-model").modal('hide')
+}
+
+let addFunc = function () {
+    let equipmentAdd = {
+        name: $("#name").val(),
+        location:  $("#location").val(),
+    }
+
+    $.ajax({
+        url: `/admin/equipment/add`,
+        dataType: "json",
+        contentType: "application/json",
+        method: "POST",
+        data: JSON.stringify(equipmentAdd),
+        success: (res) => {
+            if (res.success) {
+                window.location.reload()
+            }
+            closeModal()
+        }
+    })
 }
 
 let updateFunc = function () {
@@ -60,6 +104,7 @@ let updateFunc = function () {
             if (res.success) {
                 window.location.reload()
             }
+            closeModal()
         }
     })
 }
@@ -78,6 +123,7 @@ let deleteFunc = function (id) {
             if (res.success) {
                 window.location.reload()
             }
+            closeModal()
         }
     })
 }

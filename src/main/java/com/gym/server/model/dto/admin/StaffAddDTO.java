@@ -26,19 +26,22 @@ public class StaffAddDTO extends BaseDTO implements POConvertor<Staff> {
     private String idCard;
     @JsonProperty("position")
     private int position;
+    @JsonProperty("sex")
+    private int sex;
     @JsonProperty("entry_time")
     private String entryTime;
     @Override
     public boolean verifyParameters() {
-        return !(StringUtils.isAnyBlank(name, idCard, entryTime) || position < 0);
+        return !(StringUtils.isAnyBlank(name, idCard, entryTime) || position < 0 || sex < 0);
     }
 
     @Override
     public Staff convertToPO() {
         Staff staff = new Staff();
         staff.setName(this.name);
+        staff.setSex(Staff.Sex.parse(this.sex));
         staff.setPosition(Staff.Position.parse(this.position));
-        String dateStr = idCard.substring(6, 8);
+        String dateStr = this.idCard.substring(6, 14);
         staff.setBirthdayTime(Dates.parseDate(dateStr, Dates.Pattern.NONE_DATE));
         staff.setEntryTime(Dates.parseDate(this.entryTime));
         staff.setStatus(Staff.Status.WORKING);

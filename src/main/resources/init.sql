@@ -47,8 +47,9 @@ CREATE TABLE `member_trade`(
 DROP TABLE IF EXISTS `staff`;
 CREATE TABLE `staff`(
     `id` INT(11) PRIMARY KEY AUTO_INCREMENT COMMENT 'id',
-    `code` VARCHAR(8) NOT NULL UNIQUE COMMENT '员工工号',
+#     `code` VARCHAR(8) NOT NULL UNIQUE COMMENT '员工工号',
     `name` VARCHAR(16) NOT NULL COMMENT '员工姓名',
+    `sex` TINYINT(1) NOT NULL COMMENT '性别',
     `id_card` VARCHAR(18) NOT NULL COMMENT '身份证号',
     `status` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '状态: 0-在职 1-离职 2-删除',
     `position` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '职位: 0-管理员 1-教练 2-前台 3-保洁',
@@ -56,7 +57,7 @@ CREATE TABLE `staff`(
     `entry_time` DATETIME NOT NULL DEFAULT NOW() COMMENT '入职时间',
     `create_time` DATETIME NOT NULL DEFAULT NOW() COMMENT '创建时间',
     `update_time` DATETIME NOT NULL DEFAULT NOW() COMMENT '更新时间',
-    INDEX (`code`) COMMENT 'idx_code',
+#     INDEX (`code`) COMMENT 'idx_code',
     INDEX (`create_time`) COMMENT 'idx_create_time',
     INDEX (`update_time`) COMMENT 'idx_update_time'
 );

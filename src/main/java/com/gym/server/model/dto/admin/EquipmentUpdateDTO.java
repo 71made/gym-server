@@ -30,7 +30,7 @@ public class EquipmentUpdateDTO extends BaseDTO implements POConvertor<Equipment
 
     @Override
     public boolean verifyParameters() {
-        return !(StringUtils.isAnyBlank(name, location) || status < 0 || null == id);
+        return !StringUtils.isAnyBlank(name, location) && status >= 0 && null != id;
     }
 
     @Override

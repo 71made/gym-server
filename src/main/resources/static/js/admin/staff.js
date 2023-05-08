@@ -2,11 +2,11 @@ let staffData
 $(function () {
 
     // 初始化日期选择器
-    $("#entry-time").datepicker({
+    $("#entry-time").datetimepicker({
         language:  "zh-CN",
         autoclose: true,
         startView: 0,
-        format: "yyyy-mm-dd",
+        format: "yyyy-mm-dd hh:mm:ss",
         clearBtn: true,
         todayBtn: false,
         endDate: new Date()
@@ -20,9 +20,17 @@ $(function () {
         url: "/admin/staff/all", // 请求后台
         method: "GET",
         columns: [
-            {field: "id", title: "员工 id", align:'center'},
-            {field: "code", title: "员工工号", align:'center'},
+            {field: "id", title: "员工工号", align:'center'},
             {field: "name", title: "员工姓名", align:'center'},
+            {
+                field: "sex", title: "性别", align:'center',
+                formatter: function (value, row, index) {
+                    switch (value) {
+                        case 0: return `<label class="badge badge-primary text-white">男</label>`
+                        case 1: return `<label class="badge badge-primary text-white">女</label>`
+                    }
+                }
+            },
             {field: "id_card", title: "身份证",align:'center'},
             {
                 field: "status", title: "状态", align:'center',
@@ -36,7 +44,14 @@ $(function () {
             {
                 field: "birthday_time", title: "年龄", align:'center',
                 formatter: function (value, row, index) {
+                    console.log(getAge(value))
                     return getAge(value)
+                }
+            },
+            {
+                field: "position", title: "职位", align:'center',
+                formatter: function (value, row, index) {
+                    return `<label class="badge badge-primary text-white">${value.msg}</label>`
                 }
             },
             {field: "entry_time", title:"入职时间", align:'center'},
@@ -55,20 +70,77 @@ $(function () {
     })
 })
 
+let showAddFunc = function () {
+    // 隐藏和展示部分元素
+    $("#form-id").hide()
+    $("#staff-edit-btn").hide()
+    $("#staff-add-btn").show()
+    $("#staff-model-label").text("增加员工")
+
+    $("#position").val(0)
+    $("#sex").val(0)
+    $("#id-card").val("")
+    $(`input:radio[name='status-radios'][value='0']`).prop("checked", true)
+    $(`input:radio[name='status-radios']`).attr("disabled", true)
+    $("#name").val("")
+    $("#entry-time").val("")
+    $("#staff-model").modal('show')
+}
+
 let showFunc = function (id) {
+    // 隐藏和展示部分元素
+    $("#form-id").show()
+    $("#staff-edit-btn").show()
+    $("#staff-add-btn").hide()
+    $("#staff-model-label").text("修改信息")
+
     staffData = $("#staff-table").bootstrapTable('getRowByUniqueId', id)
+
+    $("#id").val(staffData.id)
     $("#position").val(staffData['position'].code)
+    $("#sex").val(staffData.sex)
     $("#id-card").val(staffData['id_card'])
+    $(`input:radio[name='status-radios']`).attr("disabled", false)
     $(`input:radio[name='status-radios'][value='${staffData.status}']`).prop("checked", true)
     $("#name").val(staffData.name)
     $("#entry-time").val(staffData['entry_time'])
     $("#staff-model").modal('show')
 }
 
-let updateFunc = function () {
-    let updateStaff = {
+let closeModal = function () {
+    $("#staff-model").modal('hide')
+}
+
+let addFunc = function () {
+    let addStaff = {
         name: $("#name").val(),
         id_card:  $("#id-card").val(),
+        sex: $("#sex").val(),
+        position: $("#position").val(),
+        entry_time: $("#entry-time").val()
+    }
+
+    $.ajax({
+        url: `/admin/staff/add`,
+        dataType: "json",
+        contentType: "application/json",
+        method: "POST",
+        data: JSON.stringify(addStaff),
+        success: (res) => {
+            if (res.success) {
+                window.location.reload()
+            }
+            closeModal()
+        }
+    })
+}
+
+let updateFunc = function () {
+    let updateStaff = {
+        id: $("#id").val(),
+        name: $("#name").val(),
+        id_card:  $("#id-card").val(),
+        sex: $("#sex").val(),
         position: $("#position").val(),
         status: $("input[name='status-radios']:checked").val(),
         entry_time: $("#entry-time").val()
@@ -84,22 +156,26 @@ let updateFunc = function () {
             if (res.success) {
                 window.location.reload()
             }
+            closeModal()
         }
     })
 }
 let deleteFunc = function (id) {
+    staffData = $("#staff-table").bootstrapTable('getRowByUniqueId', id)
+    let deleteStaff = {
+        ...staffData
+    }
+    deleteStaff.status = 3
     $.ajax({
         url: `/admin/staff/update`,
         dataType: "json",
         contentType: "application/json",
-        data: JSON.stringify({
-            id: id,
-            status: 2,
-        }),
+        data: JSON.stringify(deleteStaff),
         success: (res) => {
             if (res.success) {
                 window.location.reload()
             }
+            closeModal()
         }
     })
 }
@@ -109,59 +185,31 @@ let deleteFunc = function (id) {
  * @return {string}
 */
 function getAge(str){
-    const r = str.match(/^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})/);
-    if(r==null)return   false;
 
-    let d = new Date(r[1], r[3] - 1, r[4]);
+    let d = new Date(str);
     let returnStr = "";
 
-    if(d.getFullYear()===r[1]&&(d.getMonth()+1)===r[3]&&d.getDate()===r[4]){
+    let date = new Date();
+    let yearNow = date.getFullYear();
+    let monthNow = date.getMonth() + 1;
+    let dayNow = date.getDate();
 
-        let date = new Date();
-        let yearNow = date.getFullYear();
-        let monthNow = date.getMonth() + 1;
-        let dayNow = date.getDate();
+    let Y = yearNow - d.getFullYear();
+    let M = monthNow - d.getMonth();
+    let D = dayNow - d.getDay();
+    if(D < 0){
+        D = D + 30; //借一个月
+        M--;
+    }
+    if(M<0){  // 借一年 12个月
+        Y--;
+        M = M + 12; //
+    }
 
-        let largeMonths = [1,3,5,7,8,10,12], //大月， 用于计算天，只在年月都为零时，天数有效
-            lastMonth = monthNow -1>0?monthNow-1:12,  // 上一个月的月份
-            isLeapYear = false, // 是否是闰年
-            daysOFMonth = 0;    // 当前日期的上一个月多少天
-
-        if((yearNow%4===0&&yearNow%100!==0)||yearNow%400===0){  // 是否闰年， 用于计算天，只在年月都为零时，天数有效
-            isLeapYear = true;
-        }
-
-        if(largeMonths.indexOf(lastMonth)>-1){
-            daysOFMonth = 31;
-        }else if(lastMonth===2){
-            if(isLeapYear){
-                daysOFMonth = 29;
-            }else{
-                daysOFMonth = 28;
-            }
-        }else{
-            daysOFMonth = 30;
-        }
-
-        let Y = yearNow - parseInt(r[1]);
-        let M = monthNow - parseInt(r[3]);
-        let D = dayNow - parseInt(r[4]);
-        if(D < 0){
-            D = D + daysOFMonth; //借一个月
-            M--;
-        }
-        if(M<0){  // 借一年 12个月
-            Y--;
-            M = M + 12; //
-        }
-
-        if(Y<0){
-            returnStr = "-";
-
-        }else{
-            returnStr = Y+"岁";
-        }
-
+    if(Y<0){
+        returnStr = "-";
+    }else {
+        returnStr = Y + "岁";
     }
 
     return returnStr;

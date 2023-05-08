@@ -44,6 +44,12 @@ public class Staff {
     private String name;
 
     /**
+     * 员工性别
+     */
+    @TableField(Columns.SEX)
+    private Sex sex;
+
+    /**
      * 状态: 0-在职 1-已离职 2-删除
      */
     @TableField(Columns.STATUS)
@@ -53,7 +59,7 @@ public class Staff {
      * 身份证
      */
     @TableField(Columns.ID_CARD)
-    @JsonProperty("id_cord")
+    @JsonProperty("id_card")
     private String idCard;
 
     @TableField(Columns.POSITION)
@@ -144,6 +150,47 @@ public class Staff {
 
     @Getter
     @AllArgsConstructor
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER_INT)
+    public enum Sex {
+        MALE(0),
+        FEMALE(1),
+        UNKNOWN(null);
+
+        private final Integer value;
+
+        public static Sex parse(Integer code) {
+            if (null == code || (values().length - 1) <= code) return UNKNOWN;
+            return values()[code];
+        }
+
+        @MappedJdbcTypes(JdbcType.INTEGER)
+        @MappedTypes(Sex.class)
+        public static class TypeHandler extends BaseTypeHandler<Sex> {
+
+            @Override
+            public void setNonNullParameter(PreparedStatement ps, int i, Sex parameter, JdbcType jdbcType) throws SQLException {
+                ps.setInt(i, parameter.value);
+            }
+
+            @Override
+            public Sex getNullableResult(ResultSet rs, String columnName) throws SQLException {
+                return Sex.parse(rs.getInt(columnName));
+            }
+
+            @Override
+            public Sex getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
+                return Sex.parse(rs.getInt(columnIndex));
+            }
+
+            @Override
+            public Sex getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
+                return Sex.parse(cs.getInt(columnIndex));
+            }
+        }
+    }
+
+    @Getter
+    @AllArgsConstructor
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     public enum Position {
         ADMIN(0, "管理员"),
@@ -195,6 +242,7 @@ public class Staff {
         public static final String ID = "id";
         public static final String NAME = "name";
         public static final String STATUS = "status";
+        public static final String SEX = "sex";
         public static final String ID_CARD = "id_card";
         public static final String POSITION = "position";
         public static final String BIRTHDAY_TIME = "birthday_time";

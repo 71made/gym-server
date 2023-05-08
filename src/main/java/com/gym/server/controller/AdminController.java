@@ -2,10 +2,13 @@ package com.gym.server.controller;
 
 import com.gym.server.model.dto.admin.EquipmentAddDTO;
 import com.gym.server.model.dto.admin.EquipmentUpdateDTO;
+import com.gym.server.model.dto.admin.StaffAddDTO;
+import com.gym.server.model.dto.admin.StaffUpdateDTO;
 import com.gym.server.model.po.admin.Admin;
 import com.gym.server.model.po.member.Member;
 import com.gym.server.service.admin.AdminService;
 import com.gym.server.service.admin.EquipmentService;
+import com.gym.server.service.admin.StaffService;
 import com.gym.server.service.member.MemberService;
 import com.gym.utils.http.Result;
 import com.gym.utils.http.Results;
@@ -41,6 +44,9 @@ public class AdminController {
 
     @Autowired
     EquipmentService equipmentService;
+
+    @Autowired
+    StaffService staffService;
 
     @PostMapping("/login")
     @ApiOperation(value = "admin login", notes = "管理员登陆")
@@ -107,6 +113,37 @@ public class AdminController {
         if (null == adminId) return Results.failureWithStatus(Results.Status.LOGIN_MISSING);
         if (null == equipmentDTO || !equipmentDTO.verifyParameters()) return Results.failureWithStatus(Results.Status.BAD_REQUEST);
         return equipmentService.update(equipmentDTO);
+    }
+
+    @GetMapping("/staff/all")
+    @ApiOperation(value = "admin staff all", notes = "获取员工列表")
+    public Result staffAll(@ApiIgnore HttpServletRequest request) {
+        HttpSession session = request.getSession(true);
+        Integer adminId = (Integer) session.getAttribute("admin_id");
+        if (null == adminId) return Results.failureWithStatus(Results.Status.LOGIN_MISSING);
+        return staffService.all();
+    }
+
+    @PostMapping("/staff/add")
+    @ApiOperation(value = "admin staff add", notes = "增加员工")
+    public Result staffAdd(@ApiIgnore HttpServletRequest request,
+                               @RequestBody @ApiParam(value = "员工信息", required = true) StaffAddDTO staffDTO) {
+        HttpSession session = request.getSession();
+        Integer adminId = (Integer) session.getAttribute("admin_id");
+        if (null == adminId) return Results.failureWithStatus(Results.Status.LOGIN_MISSING);
+        if (null == staffDTO || !staffDTO.verifyParameters()) return Results.failureWithStatus(Results.Status.BAD_REQUEST);
+        return staffService.add(staffDTO);
+    }
+
+    @PostMapping("/staff/update")
+    @ApiOperation(value = "admin staff update", notes = "更新员工")
+    public Result staffUpdate(@ApiIgnore HttpServletRequest request,
+                                  @RequestBody @ApiParam(value = "员工信息", required = true) StaffUpdateDTO staffDTO) {
+        HttpSession session = request.getSession();
+        Integer adminId = (Integer) session.getAttribute("admin_id");
+        if (null == adminId) return Results.failureWithStatus(Results.Status.LOGIN_MISSING);
+        if (null == staffDTO || !staffDTO.verifyParameters()) return Results.failureWithStatus(Results.Status.BAD_REQUEST);
+        return staffService.update(staffDTO);
     }
 
 }

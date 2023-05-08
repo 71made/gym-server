@@ -31,7 +31,7 @@ $(function () {
                     // 转跳并储存admin信息
                     localStorage.setItem("admin", JSON.stringify(data.data))
                     localStorage.setItem("admin_id", data.data.id)
-                    window.location.replace("/pages/index");
+                    window.location.replace("/pages/admin/member");
                 } else {
                     $("#login-notice").text(data.msg)
                     $("#login-modal").modal('show')
