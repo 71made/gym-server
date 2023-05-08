@@ -1,11 +1,11 @@
 let equipmentData
 $(function () {
 
-    $("#member-table").bootstrapTable({
+    $("#equipment-table").bootstrapTable({
         uniqueId: "id", // 唯一键
         dataField: "data",
         dataType: "json",
-        url: "/admin/member/all", // 请求后台
+        url: "/admin/equipment/all", // 请求后台
         method: "GET",
         columns: [
             {field: "id", title: "器材 id", align:'center'},
@@ -38,9 +38,10 @@ $(function () {
 
 let showFunc = function (id) {
     equipmentData = $("#equipment-table").bootstrapTable('getRowByUniqueId', id)
-    $("input[name='status-radios']").attr("checked", equipmentData.status)
-    $("#name").attr("value", equipmentData.name)
-    $("#location").attr("value", equipmentData.location)
+    $(`input:radio[name='status-radios'][value='${equipmentData.status}']`).prop("checked", true)
+    $("#name").val(equipmentData.name)
+    $("#location").val(equipmentData.location)
+    $("#equipment-model").modal('show')
 }
 
 let updateFunc = function () {
@@ -52,6 +53,7 @@ let updateFunc = function () {
     $.ajax({
         url: `/admin/equipment/update`,
         dataType: "json",
+        contentType: "application/json",
         method: "POST",
         data: JSON.stringify(equipmentData),
         success: (res) => {
@@ -62,20 +64,16 @@ let updateFunc = function () {
     })
 }
 let deleteFunc = function (id) {
+    equipmentData = $("#equipment-table").bootstrapTable('getRowByUniqueId', id)
+    let deleteEquipment = {
+        ...equipmentData
+    }
+    deleteEquipment.status = 3
     $.ajax({
         url: `/admin/equipment/update`,
         dataType: "json",
-        success: (res) => {
-            if (res.success) {
-                window.location.reload()
-            }
-        }
-    })
-}
-let forbiddenFunc = function (id) {
-    $.ajax({
-        url: `/admin/equipment/update`,
-        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify(deleteEquipment),
         success: (res) => {
             if (res.success) {
                 window.location.reload()

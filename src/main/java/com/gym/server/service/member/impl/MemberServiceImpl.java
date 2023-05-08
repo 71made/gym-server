@@ -1,6 +1,7 @@
 package com.gym.server.service.member.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.gym.server.mapper.MemberMapper;
 import com.gym.server.model.dto.member.MemberRegisterDTO;
 import com.gym.server.model.po.member.Member;
@@ -79,5 +80,21 @@ public class MemberServiceImpl implements MemberService {
         Member member = memberMapper.selectById(memberId);
         if (null == member || member.getStatus().equals(Member.Status.DISABLE)) return Results.failureWithStatus(Results.Status.RECORD_NOT_EXIST);
         return Results.successWithData(member);
+    }
+
+    @Override
+    public Result all() {
+        QueryWrapper<Member> wrapper = new QueryWrapper<>();
+        wrapper.ne(Member.Columns.STATUS, Member.Status.DELETE);
+        return Results.successWithData(memberMapper.selectList(wrapper));
+    }
+
+    @Override
+    public Result update(Integer memberId, int status) {
+        if (Member.Status.parse(status).equals(Member.Status.UNKNOWN)) return Results.failure("更新状态失败");
+        UpdateWrapper<Member> wrapper = new UpdateWrapper<>();
+        wrapper.eq(Member.Columns.ID, memberId).set(Member.Columns.STATUS, status);
+        if (memberMapper.update(null, wrapper) == 0) return Results.failure("更新状态失败");
+        return Results.success("更新成功");
     }
 }

@@ -46,19 +46,4 @@ public class AdminServiceImpl implements AdminService {
         return Results.successWithData(Results.Status.LOGIN_SUCCESS, admin);
     }
 
-    @Override
-    public Result memberAll() {
-        QueryWrapper<Member> wrapper = new QueryWrapper<>();
-        wrapper.ne(Member.Columns.STATUS, Member.Status.DELETE);
-        return Results.successWithData(memberMapper.selectList(wrapper));
-    }
-
-    @Override
-    public Result update(Integer memberId, Member.Status status) {
-        if (status.equals(Member.Status.UNKNOWN)) return Results.failure("更新状态失败");
-        UpdateWrapper<Member> wrapper = new UpdateWrapper<>();
-        wrapper.eq(Member.Columns.ID, memberId).set(Member.Columns.STATUS, status.getValue());
-        if (memberMapper.update(null, wrapper) == 0) return Results.failure("更新状态失败");
-        return Results.success("更新成功");
-    }
 }
