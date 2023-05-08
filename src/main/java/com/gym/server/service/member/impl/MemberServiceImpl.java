@@ -2,6 +2,7 @@ package com.gym.server.service.member.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.gym.server.mapper.MemberCourseMapper;
 import com.gym.server.mapper.MemberMapper;
 import com.gym.server.model.dto.member.MemberRegisterDTO;
 import com.gym.server.model.po.member.Member;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * @Author: 71made
@@ -27,6 +29,9 @@ public class MemberServiceImpl implements MemberService {
 
     @Autowired
     MemberMapper memberMapper;
+
+    @Autowired
+    MemberCourseMapper memberCourseMapper;
 
     @Override
     public Result login(String cardNumber, String password) {
@@ -58,16 +63,10 @@ public class MemberServiceImpl implements MemberService {
         if (null != member) return Results.successWithStatus(Results.Status.REGISTER_REPEAT, "该手机号已被使用");
 
         // 构建新会员
-        member = new Member();
-        member.setPhone(registerDTO.getPhone());
-        member.setName(registerDTO.getName());
+        member = registerDTO.convertToPO();
+
         // MD5 摘要处理密码
         member.setPassword(DigestUtils.md5DigestAsHex(registerDTO.getPassword().getBytes()));
-        member.setCardNumber(registerDTO.getPhone());
-        member.setType(Member.Type.parse(registerDTO.getType()));
-        member.setStatus(Member.Status.parse(registerDTO.getType()));
-        member.setAmount(BigDecimal.ZERO);
-        member.setPeriod(BigDecimal.ZERO);
 
         // 插入
         if (0 == memberMapper.insert(member)) return Results.failure("会员注册失败, 请重试");
@@ -86,7 +85,13 @@ public class MemberServiceImpl implements MemberService {
     public Result all() {
         QueryWrapper<Member> wrapper = new QueryWrapper<>();
         wrapper.ne(Member.Columns.STATUS, Member.Status.DELETE);
-        return Results.successWithData(memberMapper.selectList(wrapper));
+        // 遍历查询
+        List<Member> members = memberMapper.selectList(wrapper);
+        for (Member member : members) {
+            BigDecimal period = memberCourseMapper.selectPeriodByMemberId(member.getId());
+            member.setPeriod(period);
+        }
+        return Results.successWithData(members);
     }
 
     @Override

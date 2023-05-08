@@ -54,7 +54,7 @@ $(function () {
                         // 刷新并清除admin信息
                         localStorage.removeItem("admin")
                         localStorage.removeItem("admin_id")
-                        window.location.reload();
+                        window.location.replace("/pages/admin/login");
                     }
                 }
             })
@@ -71,7 +71,7 @@ $(function () {
                         // 刷新并清除member信息
                         localStorage.removeItem("member")
                         localStorage.removeItem("member_id")
-                        window.location.reload();
+                        window.location.replace("/pages/login");
                     }
                 }
             })

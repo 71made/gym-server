@@ -7,11 +7,18 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gym.utils.date.Dates;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import org.apache.ibatis.type.BaseTypeHandler;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.MappedJdbcTypes;
+import org.apache.ibatis.type.MappedTypes;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.sql.*;
+import java.util.Date;
 
 @Data
 @TableName("`course`")
@@ -41,8 +48,8 @@ public class Course implements Serializable {
     /**
      * 状态: 0-进行中 1-停课/删除
      */
-    @TableField(Columns.STATUS)
-    private Boolean status;
+    @TableField(value = Columns.STATUS, typeHandler = Status.TypeHandler.class)
+    private Status status;
 
     /**
      * 报名人数
@@ -69,7 +76,7 @@ public class Course implements Serializable {
     @TableField(Columns.START_TIME)
     @JsonProperty("start_time")
     @JsonFormat(pattern = Dates.Pattern.DATETIME, timezone = Dates.TIMEZONE)
-    private LocalDateTime startTime;
+    private Date startTime;
 
     /**
      * 结束时间
@@ -77,7 +84,7 @@ public class Course implements Serializable {
     @TableField(Columns.END_TIME)
     @JsonProperty("end_time")
     @JsonFormat(pattern = Dates.Pattern.DATETIME, timezone = Dates.TIMEZONE)
-    private LocalDateTime endTime;
+    private Date endTime;
 
     /**
      * 创建时间
@@ -85,7 +92,7 @@ public class Course implements Serializable {
     @TableField(Columns.CREATE_TIME)
     @JsonProperty("create_time")
     @JsonFormat(pattern = Dates.Pattern.DATETIME, timezone = Dates.TIMEZONE)
-    private LocalDateTime createTime;
+    private Date createTime;
 
     /**
      * 更新时间
@@ -93,7 +100,58 @@ public class Course implements Serializable {
     @TableField(Columns.UPDATE_TIME)
     @JsonProperty("update_time")
     @JsonFormat(pattern = Dates.Pattern.DATETIME, timezone = Dates.TIMEZONE)
-    private LocalDateTime updateTime;
+    private Date updateTime;
+
+    @Getter
+    @AllArgsConstructor
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER_INT)
+    public enum Status {
+        /**
+         * 正常授课
+         */
+        WORKING(0),
+        /**
+         * 停止授课
+         */
+        STOPPING(1),
+        /**
+         * 删除
+         */
+        DELETE(2),
+        UNKNOWN(null);
+
+        private final Integer value;
+
+        public static Status parse(Integer code) {
+            if (null == code || (values().length - 1) <= code) return UNKNOWN;
+            return values()[code];
+        }
+
+        @MappedJdbcTypes(JdbcType.INTEGER)
+        @MappedTypes(Status.class)
+        public static class TypeHandler extends BaseTypeHandler<Status> {
+
+            @Override
+            public void setNonNullParameter(PreparedStatement ps, int i, Status parameter, JdbcType jdbcType) throws SQLException {
+                ps.setInt(i, parameter.value);
+            }
+
+            @Override
+            public Status getNullableResult(ResultSet rs, String columnName) throws SQLException {
+                return Status.parse(rs.getInt(columnName));
+            }
+
+            @Override
+            public Status getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
+                return Status.parse(rs.getInt(columnIndex));
+            }
+
+            @Override
+            public Status getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
+                return Status.parse(cs.getInt(columnIndex));
+            }
+        }
+    }
 
     /**
      * 映射字段名称

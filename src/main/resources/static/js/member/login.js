@@ -1,37 +1,37 @@
 $(function () {
     $("#login-btn").on("click", () => {
-        let adminName = $.trim($("#admin-account").val());
-        let adminPassword = $.trim($("#admin-password").val());
+        let number = $.trim($("#member-account").val());
+        let password = $.trim($("#member-password").val());
 
-        if (!adminName || adminName === '') {
-            $("#login-notice").text( "用户名不能为空")
+        if (!number || number === '') {
+            $("#login-notice").text( "卡号不能为空")
             $("#login-modal").modal('show')
             return
         }
 
-        if (!adminPassword || adminPassword === '') {
+        if (!password || password === '') {
             $("#login-notice").text( "密码不能为空")
             $("#login-modal").modal('show')
             return
         }
 
         $.ajax({
-            url: "/admin/login",
+            url: "/member/login",
             dataType: "json",
             method: "POST",
             xhrFields: {
                 withCredentials: true
             },
-            data: {"account": adminName, "password": adminPassword},
+            data: {"card_number": number, "password": password},
             beforeSend: function () {
                 $("#login-btn").attr("disabled", true).text("登录中....").css("opacity", 0.8);
             },
             success: function (data) {
                 if (data.success) {
-                    // 转跳并储存admin信息
-                    localStorage.setItem("admin", JSON.stringify(data.data))
-                    localStorage.setItem("admin_id", data.data.id)
-                    window.location.replace("/pages/admin/member");
+                    // 转跳并储存member信息
+                    localStorage.setItem("member", JSON.stringify(data.data))
+                    localStorage.setItem("member_id", data.data.id)
+                    window.location.replace("/pages/index");
                 } else {
                     $("#login-notice").text(data.msg)
                     $("#login-modal").modal('show')

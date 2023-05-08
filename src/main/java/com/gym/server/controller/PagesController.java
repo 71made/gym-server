@@ -16,7 +16,22 @@ public class PagesController {
 
     @GetMapping("/index")
     public String index() {
-        return "index";
+        return "pages/member/index";
+    }
+
+    @GetMapping("/login")
+    public String memberLogin() {
+        return "pages/member/login";
+    }
+
+    @GetMapping("/register")
+    public String memberRegister() {
+        return "pages/member/register";
+    }
+
+    @GetMapping("/admin/index")
+    public String adminIndex() {
+        return "pages/admin/index";
     }
 
     @GetMapping("/admin/login")
@@ -38,4 +53,10 @@ public class PagesController {
     public String adminStaff() {
         return "pages/admin/staff";
     }
+
+    @GetMapping("/admin/course")
+    public String adminCourse() {
+        return "pages/admin/course";
+    }
+
 }

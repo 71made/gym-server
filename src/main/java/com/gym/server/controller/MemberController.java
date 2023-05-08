@@ -55,6 +55,14 @@ public class MemberController {
         return memberService.register(registerDTO);
     }
 
+    @GetMapping("/logout")
+    @ApiOperation(value = "member logout", notes = "会员登出")
+    public Result logout(@ApiIgnore HttpServletRequest request) {
+        HttpSession session = request.getSession(true);
+        session.removeAttribute("member_id");
+        return Results.success("登出成功");
+    }
+
     @GetMapping("/info")
     @ApiOperation(value = "member info", notes = "会员信息")
     public Result info(@ApiIgnore HttpServletRequest request,

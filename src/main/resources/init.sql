@@ -21,7 +21,6 @@ CREATE TABLE `member`(
     `phone` VARCHAR(11) NOT NULL UNIQUE COMMENT '联系方式',
     `type` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '会员卡类型: 0-普通卡 1-银卡 2-金卡',
     `amount` DECIMAL(11, 2) NOT NULL DEFAULT 0.00 COMMENT '会员卡余额',
-    `period` DECIMAL(11, 1) NOT NULL DEFAULT 0.0 COMMENT '会员卡剩余课时',
     `create_time` DATETIME DEFAULT NOW() COMMENT '创建时间',
     `update_time` DATETIME DEFAULT NOW() COMMENT '更新时间',
     INDEX (`card_number`) COMMENT 'idx_account',
@@ -86,12 +85,17 @@ CREATE TABLE `member_course`
 (
     `id` INT(11) PRIMARY KEY AUTO_INCREMENT COMMENT 'id',
     `course_id` INT(11) NOT NULL COMMENT '课程 id',
+    `member_id` INT(11) NOT NULL COMMENT '会员 id',
     `staff_id` INT(11) NOT NULL COMMENT '教练 id',
     `status` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '状态: 0-报名 1-取消报名',
     `create_time` DATETIME NOT NULL DEFAULT NOW() COMMENT '创建时间',
     `update_time` DATETIME NOT NULL DEFAULT NOW() COMMENT '更新时间',
+    FOREIGN KEY (`course_id`) REFERENCES `course`(`id`),
+    FOREIGN KEY (`member_id`) REFERENCES `member`(`id`),
     FOREIGN KEY (`staff_id`) REFERENCES `staff`(`id`),
+    INDEX (`member_id`) COMMENT 'idx_member',
     INDEX (`staff_id`) COMMENT 'idx_staff',
+    INDEX (`course_id`) COMMENT 'idx_course',
     INDEX (`create_time`) COMMENT 'idx_create_time'
 );
 

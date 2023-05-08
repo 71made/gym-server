@@ -1,12 +1,9 @@
 package com.gym.server.controller;
 
-import com.gym.server.model.dto.admin.EquipmentAddDTO;
-import com.gym.server.model.dto.admin.EquipmentUpdateDTO;
-import com.gym.server.model.dto.admin.StaffAddDTO;
-import com.gym.server.model.dto.admin.StaffUpdateDTO;
+import com.gym.server.model.dto.admin.*;
 import com.gym.server.model.po.admin.Admin;
-import com.gym.server.model.po.member.Member;
 import com.gym.server.service.admin.AdminService;
+import com.gym.server.service.admin.CourseService;
 import com.gym.server.service.admin.EquipmentService;
 import com.gym.server.service.admin.StaffService;
 import com.gym.server.service.member.MemberService;
@@ -48,9 +45,12 @@ public class AdminController {
     @Autowired
     StaffService staffService;
 
+    @Autowired
+    CourseService courseService;
+
     @PostMapping("/login")
-    @ApiOperation(value = "admin login", notes = "管理员登陆")
-    public Result login(@ApiIgnore HttpServletRequest request,
+    @ApiOperation(value = "admin logout", notes = "管理员登陆")
+    public Result logout(@ApiIgnore HttpServletRequest request,
                         @RequestParam("account") @ApiParam(value = "管理员账号", required = true) String account,
                         @RequestParam("password") @ApiParam(value = "密码", required = true) String password) {
         if (StringUtils.isAnyBlank(account, password)) return Results.failureWithStatus(Results.Status.BAD_REQUEST);
@@ -61,6 +61,14 @@ public class AdminController {
             session.setAttribute("admin_id", ((Admin) result.getData()).getId());
         }
         return result;
+    }
+
+    @GetMapping("/logout")
+    @ApiOperation(value = "admin logout", notes = "管理员登出")
+    public Result login(@ApiIgnore HttpServletRequest request) {
+        HttpSession session = request.getSession(true);
+        session.removeAttribute("admin_id");
+        return Results.success("登出成功");
     }
 
     @GetMapping("/member/all")
@@ -144,6 +152,37 @@ public class AdminController {
         if (null == adminId) return Results.failureWithStatus(Results.Status.LOGIN_MISSING);
         if (null == staffDTO || !staffDTO.verifyParameters()) return Results.failureWithStatus(Results.Status.BAD_REQUEST);
         return staffService.update(staffDTO);
+    }
+
+    @GetMapping("/course/all")
+    @ApiOperation(value = "admin course all", notes = "获取课程列表")
+    public Result courseAll(@ApiIgnore HttpServletRequest request) {
+        HttpSession session = request.getSession(true);
+        Integer adminId = (Integer) session.getAttribute("admin_id");
+        if (null == adminId) return Results.failureWithStatus(Results.Status.LOGIN_MISSING);
+        return courseService.all();
+    }
+
+    @PostMapping("/course/add")
+    @ApiOperation(value = "admin course add", notes = "增加课程")
+    public Result courseAdd(@ApiIgnore HttpServletRequest request,
+                           @RequestBody @ApiParam(value = "课程信息", required = true) CourseAddDTO courseDTO) {
+        HttpSession session = request.getSession();
+        Integer adminId = (Integer) session.getAttribute("admin_id");
+        if (null == adminId) return Results.failureWithStatus(Results.Status.LOGIN_MISSING);
+        if (null == courseDTO || !courseDTO.verifyParameters()) return Results.failureWithStatus(Results.Status.BAD_REQUEST);
+        return courseService.add(courseDTO);
+    }
+
+    @PostMapping("/course/update")
+    @ApiOperation(value = "admin course update", notes = "更新课程")
+    public Result courseUpdate(@ApiIgnore HttpServletRequest request,
+                              @RequestBody @ApiParam(value = "课程信息", required = true) CourseUpdateDTO courseDTO) {
+        HttpSession session = request.getSession();
+        Integer adminId = (Integer) session.getAttribute("admin_id");
+        if (null == adminId) return Results.failureWithStatus(Results.Status.LOGIN_MISSING);
+        if (null == courseDTO || !courseDTO.verifyParameters()) return Results.failureWithStatus(Results.Status.BAD_REQUEST);
+        return courseService.update(courseDTO);
     }
 
 }

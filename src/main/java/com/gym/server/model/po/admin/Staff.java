@@ -46,13 +46,13 @@ public class Staff {
     /**
      * 员工性别
      */
-    @TableField(Columns.SEX)
+    @TableField(value = Columns.SEX, typeHandler = Sex.TypeHandler.class)
     private Sex sex;
 
     /**
      * 状态: 0-在职 1-已离职 2-删除
      */
-    @TableField(Columns.STATUS)
+    @TableField(value = Columns.STATUS, typeHandler = Status.TypeHandler.class)
     private Status status;
 
     /**
@@ -62,7 +62,7 @@ public class Staff {
     @JsonProperty("id_card")
     private String idCard;
 
-    @TableField(Columns.POSITION)
+    @TableField(value = Columns.POSITION, typeHandler = Position.TypeHandler.class)
     private Position position;
 
     /**
