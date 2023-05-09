@@ -1,6 +1,7 @@
 package com.gym.server.service.admin;
 
 
+import com.gym.exception.ServiceException;
 import com.gym.server.model.dto.admin.CourseAddDTO;
 import com.gym.server.model.dto.admin.CourseUpdateDTO;
 import com.gym.utils.http.Result;
@@ -41,5 +42,5 @@ public interface CourseService {
      * @Return: com.gym.utils.http.Result
      * @Description: 更新课程信息
      */
-    Result update(CourseUpdateDTO courseDTO);
+    Result update(CourseUpdateDTO courseDTO) throws ServiceException;
 }

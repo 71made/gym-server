@@ -5,11 +5,10 @@ $(function () {
     $("#entry-time").datetimepicker({
         language:  "zh-CN",
         autoclose: true,
-        startView: 0,
-        format: "yyyy-mm-dd hh:mm:ss",
+        minView: 0,
+        format: "yyyy-mm-dd hh:ii:ss",
         clearBtn: true,
         todayBtn: false,
-        endDate: new Date()
     })
 
 

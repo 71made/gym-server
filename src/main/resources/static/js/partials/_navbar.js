@@ -3,22 +3,25 @@ const accountInfo = localStorage.getItem("admin") || localStorage.getItem("membe
 $(function () {
     let init = function () {
         if (!accountInfo) {
-            window.location.replace("/pages/member/login")
+            window.location.replace("/pages/login")
         } else {
-            let obj = JSON.parse(accountInfo)
-            $("#account-name").text(obj.account || obj.name)
-            if (localStorage.getItem("admin_id")) {
+            if (localStorage.getItem("admin_id") && window.location.pathname.startsWith("/pages/admin")) {
+                let obj = JSON.parse(localStorage.getItem("admin"))
+                $("#account-name").text(obj.account)
                 $("#account-type").text("系统管理员")
                 $("#account-info").hide()
                 return
             }
             if (localStorage.getItem("member_id")) {
+                let obj = JSON.parse(localStorage.getItem("member"))
+                $("#account-name").text(obj.name)
+                $("#left-top").hide()
                 $("#account-info").show().on("click", () => {
-                    window.location.replace("/pages/member/info")
+                    window.location.replace("/pages/index")
                 })
                 let text = ""
                 let styleClass = ""
-                switch (obj.type.code) {
+                switch (obj['type'].code) {
                     default:
                     case 0: {
                         text = "普通会员"

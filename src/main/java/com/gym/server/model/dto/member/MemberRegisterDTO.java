@@ -23,10 +23,6 @@ public class MemberRegisterDTO extends BaseDTO implements POConvertor<Member> {
     private String password;
     @JsonProperty("name")
     private String name;
-//    @JsonProperty("status")
-//    private int status;
-//    @JsonProperty("type")
-//    private int type;
     @JsonProperty("phone")
     private String phone;
 

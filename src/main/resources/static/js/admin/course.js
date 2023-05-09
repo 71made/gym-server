@@ -5,23 +5,26 @@ $(function () {
     $("#start-time").datetimepicker({
         language:  "zh-CN",
         autoclose: true,
-        startView: 0,
-        format: "yyyy-mm-dd hh:mm:ss",
+        minView: 0,
+        format: "yyyy-mm-dd hh:ii:ss",
         clearBtn: true,
         todayBtn: false,
-        endDate: new Date()
-    })
+    }).on("changeDate", function (e) {
+        $('#end-time').datetimepicker('setStartDate', e.date);
+    });
 
     // 初始化日期选择器
     $("#end-time").datetimepicker({
         language:  "zh-CN",
         autoclose: true,
-        startView: 0,
-        format: "yyyy-mm-dd hh:mm:ss",
+        minView: 0,
+        format: "yyyy-mm-dd hh:ii:ss",
         clearBtn: true,
         todayBtn: false,
-        endDate: new Date()
-    })
+        startDate: new Date(),
+    }).on("changeDate", function (e) {
+        $('#start-time').datetimepicker('setEndDate', e.date);
+    });
 
     let init = function () {
         $.ajax({
@@ -88,14 +91,15 @@ let showAddFunc = function () {
     $("#course-add-btn").show()
     $("#course-model-label").text("增加课程")
 
-    $(`input:radio[name='status-radios']`).val("").attr("disabled", true)
+    $(`input:radio[name='status-radios'][value='0']`).prop("checked", true)
+    $(`input:radio[name='status-radios']`).attr("disabled", true)
     $("#name").val("")
     $("#id").val(courseData.id)
     $("#period").val("")
     $("#amount").val("")
     $("#staff").val("")
-    $("#start-time").val(courseData['start_time'])
-    $("#end-time").val(courseData['end_time'])
+    $("#start-time").val("")
+    $("#end-time").val("")
     $("#course-model").modal('show')
 }
 

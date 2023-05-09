@@ -2,19 +2,24 @@ package com.gym.server.service.member.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.gym.exception.ServiceException;
 import com.gym.server.mapper.MemberCourseMapper;
 import com.gym.server.mapper.MemberMapper;
+import com.gym.server.mapper.MemberTradeMapper;
 import com.gym.server.model.dto.member.MemberRegisterDTO;
 import com.gym.server.model.po.member.Member;
+import com.gym.server.model.po.member.MemberTrade;
 import com.gym.server.service.member.MemberService;
 import com.gym.utils.http.Result;
 import com.gym.utils.http.Results;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -33,6 +38,9 @@ public class MemberServiceImpl implements MemberService {
     @Autowired
     MemberCourseMapper memberCourseMapper;
 
+    @Autowired
+    MemberTradeMapper memberTradeMapper;
+
     @Override
     public Result login(String cardNumber, String password) {
         // 查询会员
@@ -46,6 +54,7 @@ public class MemberServiceImpl implements MemberService {
         // 验证密码
         if (!DigestUtils.md5DigestAsHex(password.getBytes()).equals(member.getPassword()))
             return Results.failureWithStatus(Results.Status.LOGIN_ERROR, "会员密码错误");
+        member.setPeriod(memberCourseMapper.selectPeriodByMemberId(member.getId()));
         return Results.successWithData(Results.Status.LOGIN_SUCCESS, member);
     }
 
@@ -78,6 +87,7 @@ public class MemberServiceImpl implements MemberService {
         // 查询会员
         Member member = memberMapper.selectById(memberId);
         if (null == member || member.getStatus().equals(Member.Status.DISABLE)) return Results.failureWithStatus(Results.Status.RECORD_NOT_EXIST);
+        member.setPeriod(memberCourseMapper.selectPeriodByMemberId(member.getId()));
         return Results.successWithData(member);
     }
 
@@ -101,5 +111,36 @@ public class MemberServiceImpl implements MemberService {
         wrapper.eq(Member.Columns.ID, memberId).set(Member.Columns.STATUS, status);
         if (memberMapper.update(null, wrapper) == 0) return Results.failure("更新状态失败");
         return Results.success("更新成功");
+    }
+
+    @Override
+    public Result upgrade(Integer memberId) {
+        Member member = memberMapper.selectById(memberId);
+        if (member.getType().equals(Member.Type.NORMAL)) {
+            member.setType(Member.Type.SILVER);
+        } else if (member.getType().equals(Member.Type.SILVER)) {
+            member.setType(Member.Type.GOLD);
+        } else if (member.getType().equals(Member.Type.GOLD)) {
+            return Results.failure("已经升级为最高级");
+        }
+        if (0 == memberMapper.updateById(member)) return Results.failure("更新失败");
+        return Results.success("升级成功");
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Result recharge(Integer memberId, BigDecimal amount) throws ServiceException {
+        BigDecimal lastAmount = memberMapper.selectMemberAmountForUpdate(memberId);
+        // 构建充值记录
+        MemberTrade memberTrade = new MemberTrade();
+        memberTrade.setMemberId(memberId);
+        memberTrade.setLastAmount(lastAmount);
+        memberTrade.setAmount(amount);
+        memberTrade.setNotes("会员卡充值");
+        memberTrade.setType(MemberTrade.Type.INCOME);
+        memberTrade.setCreateTime(new Date());
+        if (0 == memberTradeMapper.insert(memberTrade)) throw new ServiceException("充值失败");
+        if (0 == memberMapper.calcMemberAmount(memberId, amount)) throw new ServiceException("充值失败");
+        return Results.success("充值成功");
     }
 }

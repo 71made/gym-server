@@ -92,6 +92,17 @@ public class AdminController {
         return memberService.update(memberId, status);
     }
 
+    @GetMapping("/member/upgrade")
+    @ApiOperation(value = "admin member upgrade", notes = "升级会员类型")
+    public Result memberUpgrade(@ApiIgnore HttpServletRequest request,
+                               @RequestParam("member_id") @ApiParam(value = "会员 id", required = true) Integer memberId) {
+        HttpSession session = request.getSession();
+        Integer adminId = (Integer) session.getAttribute("admin_id");
+        if (null == adminId) return Results.failureWithStatus(Results.Status.LOGIN_MISSING);
+        if (null == memberId) return Results.failureWithStatus(Results.Status.BAD_REQUEST);
+        return memberService.upgrade(memberId);
+    }
+
     @GetMapping("/equipment/all")
     @ApiOperation(value = "admin equipment all", notes = "获取器材列表")
     public Result equipmentAll(@ApiIgnore HttpServletRequest request) {
@@ -182,7 +193,12 @@ public class AdminController {
         Integer adminId = (Integer) session.getAttribute("admin_id");
         if (null == adminId) return Results.failureWithStatus(Results.Status.LOGIN_MISSING);
         if (null == courseDTO || !courseDTO.verifyParameters()) return Results.failureWithStatus(Results.Status.BAD_REQUEST);
-        return courseService.update(courseDTO);
+        try {
+            return courseService.update(courseDTO);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Results.failure(e.getMessage());
+        }
     }
 
 }

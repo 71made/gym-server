@@ -1,8 +1,12 @@
 package com.gym.server.service.member;
 
+import com.gym.exception.ServiceException;
 import com.gym.server.model.dto.member.MemberRegisterDTO;
 import com.gym.server.model.po.member.Member;
 import com.gym.utils.http.Result;
+
+import java.math.BigDecimal;
+import java.text.Bidi;
 
 /**
  * @Author: 71made
@@ -61,4 +65,24 @@ public interface MemberService {
      * @Description: 更新会员 status
      */
     Result update(Integer memberId, int status);
+
+    /**
+     * @Method: upgrade
+     * @Author: 71made
+     * @Date: 2023-05-08 22:53
+     * @Params: [memberId]
+     * @Return: com.gym.utils.http.Result
+     * @Description: 会员升级: 普通->白银->黄金
+     */
+    Result upgrade(Integer memberId);
+
+    /**
+     * @Method: recharge
+     * @Author: 71made
+     * @Date: 2023-05-08 22:48
+     * @Params: [memberId, amount]
+     * @Return: com.gym.utils.http.Result
+     * @Description: 会员余额充值
+     */
+    Result recharge(Integer memberId, BigDecimal amount) throws ServiceException;
 }

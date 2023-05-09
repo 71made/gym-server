@@ -21,7 +21,7 @@
     <!-- Layout styles -->
     <link rel="stylesheet" href="/static/css/style-index.css">
     <!-- End Layout styles -->
-    <link rel="shortcut icon" href="/static/images/favicon.ico" />
+    <link rel="shortcut icon" href="/static/images/favicon.ico"/>
 </head>
 <body>
 <div class="container-scroller">
@@ -29,12 +29,56 @@
     <nav th:replace="~{partials/_navbar :: header}"></nav>
     <!-- partial -->
     <div class="container-fluid page-body-wrapper">
-        <!-- partial:./partials/_sidebar.html -->
-        <nav th:replace="~{partials/_sidebar :: sidebar}"></nav>
-        <!-- partial -->
-        <div class="main-panel">
+        <div class="main-panel" style="width: 100%">
             <div class="content-wrapper">
+                <div class="container row" style="min-height: 80vh; width: 100%; margin: 0 auto">
+                    <div class="col-md-12">
+                        <div th:replace="~{pages/member/_member_top :: top}"></div>
+                    </div>
+                    <div class="card text-center col-md-12" style="min-height: calc(80vh - 200px); margin-top: 10px">
+                        <div class="card-header" style="padding: 0.75rem 1.25rem">
+                            <ul class="nav nav-tabs card-header-tabs">
+                                <li class="nav-item">
+                                    <a class="nav-link active" href="/pages/index">缴费记录</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/pages/course">已报课程</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/pages/course/all">所有课程</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-body">
+<!--                            <h5 class="card-title">Special title treatment</h5>-->
+                            <div class="table-responsive">
+                                <table  class="table table-stretched">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>类型</th>
+                                        <th>上次金额</th>
+                                        <th>交易金额</th>
+                                        <th>交易时间</th>
+                                        <th>备注</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="member-trade-table">
 
+<!--                                    <tr>-->
+<!--                                        <td>-->
+<!--                                            <p class="mb-1 text-dark font-weight-medium">AMZN</p><small class="font-weight-medium">Amazon.com, Inc.</small>-->
+<!--                                        </td>-->
+<!--                                        <td class="font-weight-medium">$546.00</td>-->
+<!--                                        <td class="text-success font-weight-medium">+24.34</td>-->
+<!--                                    </tr>-->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
             <!-- content-wrapper ends -->
             <!-- partial:./partials/_footer.html -->
@@ -60,6 +104,8 @@
 <!-- Custom js for this page-->
 <!--<script src="/static/js/shared/jquery.cookie.js" type="text/javascript"></script>-->
 <script src="/static/js/partials/_navbar.js"></script>
+<script src="/static/js/member/_member_top.js"></script>
+<script src="/static/js/member/index.js"></script>
 <!-- End custom js for this page-->
 </body>
 </html>

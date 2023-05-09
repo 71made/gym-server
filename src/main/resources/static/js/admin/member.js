@@ -23,7 +23,7 @@ $(function () {
             },
             {
                 field: "amount", title: "卡内余额", align:'center', formatter: function (value, row, index) {
-                    if (value || value === '' || value === null) return "-"
+                    if (!value || value === '' || value === null) return "-"
                     return `<span class="text-danger">¥${value}</span>`
                 }
             },

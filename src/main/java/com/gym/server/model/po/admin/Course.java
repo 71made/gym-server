@@ -1,9 +1,6 @@
 package com.gym.server.model.po.admin;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gym.utils.date.Dates;
@@ -67,7 +64,7 @@ public class Course implements Serializable {
     /**
      * 报名金额
      */
-    @TableField(Columns.AMOUNT)
+    @TableField(value = Columns.AMOUNT, fill = FieldFill.UPDATE)
     private BigDecimal amount;
 
     /**

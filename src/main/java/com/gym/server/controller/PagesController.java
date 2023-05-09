@@ -29,6 +29,16 @@ public class PagesController {
         return "pages/member/register";
     }
 
+    @GetMapping("/course")
+    public String memberCourse() {
+        return "pages/member/course";
+    }
+
+    @GetMapping("/course/all")
+    public String memberCourseAll() {
+        return "pages/member/course_all";
+    }
+
     @GetMapping("/admin/index")
     public String adminIndex() {
         return "pages/admin/index";

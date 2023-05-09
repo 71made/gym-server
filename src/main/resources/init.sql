@@ -30,15 +30,14 @@ CREATE TABLE `member`(
 DROP TABLE IF EXISTS `member_trade`;
 CREATE TABLE `member_trade`(
     `id` INT(11) PRIMARY KEY AUTO_INCREMENT COMMENT 'id',
-    `trade_code` VARCHAR(64) NOT NULL UNIQUE COMMENT '交易流水号',
+    `member_id` INT(11) NOT NULL COMMENT '关联用户 id',
     `type` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '类型: 0-收入 1-支出',
-    `status` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '状态: 0-正常交易 1-撤销交易 2-异常标记',
     `last_amount` DECIMAL(11, 2) NOT NULL DEFAULT 0.00 COMMENT '上次金额',
     `amount` DECIMAL(11, 2) NOT NULL DEFAULT 0.00 COMMENT '交易金额',
     `notes` VARCHAR(255) COMMENT '备注',
     `create_time` DATETIME DEFAULT NOW() COMMENT '创建时间',
     `update_time` DATETIME DEFAULT NOW() COMMENT '更新时间',
-    INDEX (`trade_code`) COMMENT 'idx_trade_code',
+    FOREIGN KEY (`member_id`) REFERENCES `member`(`id`),
     INDEX (`create_time`) COMMENT 'idx_create_time'
 );
 
@@ -67,7 +66,7 @@ CREATE TABLE `course`
     `id` INT(11) PRIMARY KEY AUTO_INCREMENT COMMENT 'id',
     `staff_id` INT(11) NOT NULL COMMENT '教练 id',
     `name` VARCHAR(32) NOT NULL COMMENT '课程名称',
-    `status` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '状态: 0-进行中 1-停课/删除',
+    `status` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '状态: 0-进行中 1-停课 2-删除',
     `member_count` INT NOT NULL DEFAULT 0 COMMENT '报名人数',
     `period` DECIMAL(11, 2) NOT NULL DEFAULT 0.0 COMMENT '课程学时',
     `amount` DECIMAL(11, 2) NOT NULL DEFAULT 0.00 COMMENT '报名金额',
