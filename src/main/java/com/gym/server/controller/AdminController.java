@@ -2,10 +2,7 @@ package com.gym.server.controller;
 
 import com.gym.server.model.dto.admin.*;
 import com.gym.server.model.po.admin.Admin;
-import com.gym.server.service.admin.AdminService;
-import com.gym.server.service.admin.CourseService;
-import com.gym.server.service.admin.EquipmentService;
-import com.gym.server.service.admin.StaffService;
+import com.gym.server.service.admin.*;
 import com.gym.server.service.member.MemberService;
 import com.gym.utils.http.Result;
 import com.gym.utils.http.Results;
@@ -48,9 +45,12 @@ public class AdminController {
     @Autowired
     CourseService courseService;
 
+    @Autowired
+    LostItemService lostItemService;
+
     @PostMapping("/login")
-    @ApiOperation(value = "admin logout", notes = "管理员登陆")
-    public Result logout(@ApiIgnore HttpServletRequest request,
+    @ApiOperation(value = "admin login", notes = "管理员登陆")
+    public Result login(@ApiIgnore HttpServletRequest request,
                         @RequestParam("account") @ApiParam(value = "管理员账号", required = true) String account,
                         @RequestParam("password") @ApiParam(value = "密码", required = true) String password) {
         if (StringUtils.isAnyBlank(account, password)) return Results.failureWithStatus(Results.Status.BAD_REQUEST);
@@ -199,6 +199,36 @@ public class AdminController {
             e.printStackTrace();
             return Results.failure(e.getMessage());
         }
+    }
+
+    @GetMapping("/lost_item/all")
+    @ApiOperation(value = "admin lost item all", notes = "获取遗失物品列表")
+    public Result lostItemAll(@ApiIgnore HttpServletRequest request) {
+        HttpSession session = request.getSession(true);
+        Integer adminId = (Integer) session.getAttribute("admin_id");
+        if (null == adminId) return Results.failureWithStatus(Results.Status.LOGIN_MISSING);
+        return lostItemService.all();
+    }
+
+    @PostMapping("/lost_item/add")
+    @ApiOperation(value = "admin lost item add", notes = "增加遗失物品")
+    public Result lostItemAdd(@ApiIgnore HttpServletRequest request,
+                              @RequestBody @ApiParam(value = "遗失物品信息", required = true)LostItemAddDTO lostItemAddDTO) {
+        HttpSession session = request.getSession();
+        Integer adminId = (Integer) session.getAttribute("admin_id");
+        if (null == adminId) return Results.failureWithStatus(Results.Status.LOGIN_MISSING);
+        if (null == lostItemAddDTO || !lostItemAddDTO.verifyParameters()) return Results.failureWithStatus(Results.Status.BAD_REQUEST);
+        return lostItemService.add(lostItemAddDTO);
+    }
+    @PostMapping("/lost_item/update")
+    @ApiOperation(value = "admin lost item update", notes = "更新遗失物品")
+    public Result lostItemUpdate(@ApiIgnore HttpServletRequest request,
+                                 @RequestBody @ApiParam(value = "遗失物品信息", required = true)LostItemUpdateDTO lostItemUpdateDTO) {
+        HttpSession session = request.getSession();
+        Integer adminId = (Integer) session.getAttribute("admin_id");
+        if (null == adminId) return Results.failureWithStatus(Results.Status.LOGIN_MISSING);
+        if (null == lostItemUpdateDTO || !lostItemUpdateDTO.verifyParameters()) return Results.failureWithStatus(Results.Status.BAD_REQUEST);
+        return lostItemService.update(lostItemUpdateDTO);
     }
 
 }

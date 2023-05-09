@@ -69,4 +69,8 @@ public class PagesController {
         return "pages/admin/course";
     }
 
+    @GetMapping("/admin/lost_item")
+    public String adminLostItem() {
+        return "/pages/admin/lost_item";
+    }
 }
