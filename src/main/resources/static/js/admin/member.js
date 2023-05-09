@@ -47,6 +47,9 @@ $(function () {
             {
                 title: "操作", align:'center', formatter: function (value, row, index) {
                     let operations = []
+                    if ((row.type.code === 0 || row.type.code === 1) && row.status !== 2) {
+                        operations.push(`<button type="button" class="btn btn-link btn-rounded text-success" onclick="upgradeFunc(${row.id})">升级</button>`)
+                    }
                     if (row.status === 0 || row.status === 1) {
                        operations.push(`<button type="button" class="btn btn-link btn-rounded text-danger" onclick="forbiddenFunc(${row.id})">禁用</button>`)
                     }
@@ -61,6 +64,18 @@ $(function () {
         ]
     })
 })
+
+let upgradeFunc = function (id) {
+    $.ajax({
+        url: `/admin/member/upgrade?member_id=${id}`,
+        dataType: "json",
+        success: (res) => {
+            if (res.success) {
+                window.location.reload()
+            }
+        }
+    })
+}
 
 let normalFunc = function (id) {
     $.ajax({
