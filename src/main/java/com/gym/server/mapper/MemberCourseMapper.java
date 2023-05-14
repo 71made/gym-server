@@ -20,7 +20,7 @@ import java.util.List;
 public interface MemberCourseMapper extends BaseMapper<MemberCourse> {
 
     @Select("SELECT IFNULL(SUM(`period`), 0.0) FROM `member_course` " +
-            "RIGHT JOIN `course` ON `member_course`.`member_id` = `course`.`id` " +
+            "RIGHT JOIN `course` ON `member_course`.`course_id` = `course`.`id` " +
             "WHERE `member_course`.`member_id` = #{member_id} " +
             "AND `course`.`status` != 2 " +
             "AND `course`.`end_time` > NOW()")

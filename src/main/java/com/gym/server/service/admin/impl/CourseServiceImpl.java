@@ -83,11 +83,10 @@ public class CourseServiceImpl implements CourseService {
 
         // 对于 WORKING -> DELETE/STOPPING 状态转换的情况需要对会员退课处理
         if (oldCourse.getStatus().equals(Course.Status.WORKING)) {
-            // 更新状态时, 对会员退课
-            if (courseDTO.getStatus() == Course.Status.DELETE.getValue()
-                    // 停课只对还上课的课程退课
-                    || (courseDTO.getStatus() == Course.Status.STOPPING.getValue()
-                    && oldCourse.getEndTime().compareTo(new Date()) <= 0)) {
+            // 更新状态时, 对会员退课, 只对还上课的课程退课
+            if ((Course.Status.parse(courseDTO.getStatus()).equals(Course.Status.DELETE)
+                    || Course.Status.parse(courseDTO.getStatus()).equals(Course.Status.STOPPING))
+                    && oldCourse.getEndTime().before(new Date())) {
                 // 查询还在课中的会员 id
                 QueryWrapper<MemberCourse> queryWrapper = new QueryWrapper<>();
                 queryWrapper.select(MemberCourse.Columns.MEMBER_ID)
